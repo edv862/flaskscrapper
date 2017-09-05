@@ -5,8 +5,7 @@ from conect_mysql import dbHelper
 
 def getInfo():
     db = dbHelper()
-    file = open("data.csv", "w+")
-    c = csv.writer(file)
+    c = csv.writer(open("data.csv", "w+"))
 
     con = db.connect()
     cur = con.cursor()
@@ -26,8 +25,6 @@ def getInfo():
         c.writerow(row)
         products -= 1
 
-    file.close()
-    return file
 
 # print a nice greeting.
 def say_hello(username = "World"):
