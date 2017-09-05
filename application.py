@@ -31,7 +31,6 @@ def getInfo():
 
 # print a nice greeting.
 def say_hello(username = "World"):
-    getInfo()
     return '<p>Hello %s!</p>\n' % username
 
 # some bits of text for the page.
