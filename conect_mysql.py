@@ -7,7 +7,7 @@ class dbHelper:
     # Functions to manage mysql database.
     def connect(self):
         try:
-            con = mysql.connect(host='localhost', user='root', password='bexkr54abexkr54a', database='webuyscrapper')
+            con = mysql.connect(host='webuyscrapper.cvbkofwcflsi.us-east-2.rds.amazonaws.com', user='root', passwd='bexkr54a', db='webuyscrapper')
 
             cur = con.cursor()
             cur.execute("SELECT VERSION()")
