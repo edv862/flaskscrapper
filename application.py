@@ -1,12 +1,12 @@
-from flask import Flask, make_response, send_from_directory
+from flask import Flask, make_response
 import csv
 from conect_mysql import dbHelper
 
 
 def getInfo():
     db = dbHelper()
-    c = csv.writer(open("data.csv", "w+"))
-
+    csvstring = """name,make,model,colour,capacity,image,sku,url,category,subcategory,grade,sellprice,buyprice,voucherprice
+"""
     con = db.connect()
     cur = con.cursor()
     products = cur.execute(
@@ -19,43 +19,29 @@ def getInfo():
             LEFT JOIN price ON p.price=price.id
             """)
 
-    c.writerow(['name', 'make', 'model', 'colour', 'capacity', 'image', 'sku', 'url', 'category', 'subcategory', 'grade', 'sellprice', 'buyprice', 'voucherprice'])
     while products > 0:
-        row = cur.fetchone()
-        c.writerow(row)
+        aux = cur.fetchone()
+        csvstring += (str(aux)[1:-1] + '\n').replace('\'', '"')
         products -= 1
 
+    return csvstring
 
-# print a nice greeting.
-def say_hello(username = "World"):
-    getInfo()
-    return '<p>Hello %s!</p>\n' % username
-
-# some bits of text for the page.
-header_text = '''
-    <html>\n<head> <title>EB Flask Test</title> </head>\n<body>'''
-instructions = '''
-    <p><em>Hint</em>: This is a WUBWUBWUBUBW web service! Append a username
-    to the URL (for example: <code>/Thelonious</code>) to say hello to
-    someone specific.</p>\n'''
-home_link = '<p><a href="/">Back</a></p>\n'
-footer_text = '</body>\n</html>'
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
 
-# add a rule for the index page.
-application.add_url_rule('/', 'index', (lambda: header_text +
-    say_hello() + instructions + footer_text))
 
-# add a rule when the page is accessed with a name appended to the site
-# URL.
-application.add_url_rule('/<username>', 'hello', (lambda username:
-    header_text + say_hello(username) + home_link + footer_text))
+@application.route('/')
+def index():
+    csvstring = getInfo()
+    response = make_response(csvstring)
+    response.headers["Content-Disposition"] = "attachment; filename=export.csv"
+    response.headers["Content-type"] = "text/csv"
+    return response
+
 
 # run the app.
 if __name__ == "__main__":
     # Setting debug to True enables debug output. This line should be
     # removed before deploying a production app.
-    application.debug = True
     application.run()
